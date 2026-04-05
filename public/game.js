@@ -132,7 +132,7 @@ function renderBoard() {
 const BOOSTED = new Set(['2x3', '3x2', '3x3']);
 const WEIGHTED_SHAPES = [];
 SHAPES.forEach(s => {
-  const count = BOOSTED.has(s.name) ? 3 : 1;
+  const count = BOOSTED.has(s.name) ? 2 : 1;
   for (let i = 0; i < count; i++) WEIGHTED_SHAPES.push(s);
 });
 
