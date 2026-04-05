@@ -309,9 +309,15 @@ let currentPreview = null;
 function getGridCellFromPoint(x, y) {
   const boardRect = boardEl.getBoundingClientRect();
   const cellTotal = boardRect.width / GRID;
-  const c = Math.floor((x - boardRect.left) / cellTotal);
-  const r = Math.floor((y - boardRect.top) / cellTotal);
-  if (r < 0 || r >= GRID || c < 0 || c >= GRID) return null;
+  // Expand hit zone by 1.5 cells around the board edges
+  const margin = cellTotal * 1.5;
+  if (x < boardRect.left - margin || x > boardRect.right + margin ||
+      y < boardRect.top - margin || y > boardRect.bottom + margin) {
+    return null;
+  }
+  // Clamp to grid bounds so dragging near edges still snaps
+  const c = Math.min(GRID - 1, Math.max(0, Math.floor((x - boardRect.left) / cellTotal)));
+  const r = Math.min(GRID - 1, Math.max(0, Math.floor((y - boardRect.top) / cellTotal)));
   return { r, c };
 }
 
@@ -349,12 +355,23 @@ function startDrag(slotIdx, clientX, clientY) {
   slot.style.opacity = '0.3';
 }
 
-function moveGhost(x, y) {
+function moveGhost(x, y, snappedToGrid) {
   if (!ghostEl) return;
-  const rect = ghostEl.getBoundingClientRect();
-  // Position ghost above finger/cursor
-  ghostEl.style.left = `${x - rect.width / 2}px`;
-  ghostEl.style.top = `${y - rect.height / 2 - 50}px`;
+  if (snappedToGrid) {
+    // Snap ghost directly onto the grid cells
+    const boardRect = boardEl.getBoundingClientRect();
+    const cellTotal = boardRect.width / GRID;
+    const anchorR = snappedToGrid.anchorR;
+    const anchorC = snappedToGrid.anchorC;
+    ghostEl.style.left = `${boardRect.left + anchorC * cellTotal}px`;
+    ghostEl.style.top = `${boardRect.top + anchorR * cellTotal}px`;
+    ghostEl.style.opacity = '0.9';
+  } else {
+    const rect = ghostEl.getBoundingClientRect();
+    ghostEl.style.left = `${x - rect.width / 2}px`;
+    ghostEl.style.top = `${y - rect.height / 2 - 50}px`;
+    ghostEl.style.opacity = '0.6';
+  }
 }
 
 function updatePreview(x, y) {
@@ -364,13 +381,19 @@ function updatePreview(x, y) {
   // Adjust point to be where the ghost center is (above touch)
   const adjustedY = y - 50;
   const pos = getGridCellFromPoint(x, adjustedY);
-  if (!pos) return;
+  if (!pos) {
+    moveGhost(x, y, null);
+    return;
+  }
 
   const anchorR = pos.r - dragging.offsetR;
   const anchorC = pos.c - dragging.offsetC;
   const valid = canPlace(dragging.shape, anchorR, anchorC);
 
   currentPreview = { anchorR, anchorC, valid };
+
+  // Snap ghost to grid
+  moveGhost(x, y, { anchorR, anchorC });
 
   dragging.shape.cells.forEach(([dr, dc]) => {
     const r = anchorR + dr;
