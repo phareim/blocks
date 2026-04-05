@@ -42,6 +42,9 @@ const SHAPES = [
   { cells: [[0,0],[0,1],[0,2],[1,0],[2,0]], name: 'bigL-b' },
   { cells: [[0,0],[0,1],[0,2],[1,2],[2,2]], name: 'bigL-c' },
   { cells: [[0,2],[1,2],[2,0],[2,1],[2,2]], name: 'bigL-d' },
+  // 2x3 / 3x2 rectangles
+  { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], name: '2x3' },
+  { cells: [[0,0],[0,1],[1,0],[1,1],[2,0],[2,1]], name: '3x2' },
   // 3x3 square
   { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], name: '3x3' },
 ];
@@ -125,8 +128,16 @@ function renderBoard() {
 }
 
 // ── Pieces ──
+// Weighted shape selection — boost 2x3, 3x2, and 3x3
+const BOOSTED = new Set(['2x3', '3x2', '3x3']);
+const WEIGHTED_SHAPES = [];
+SHAPES.forEach(s => {
+  const count = BOOSTED.has(s.name) ? 3 : 1;
+  for (let i = 0; i < count; i++) WEIGHTED_SHAPES.push(s);
+});
+
 function randomShape() {
-  return SHAPES[Math.floor(Math.random() * SHAPES.length)];
+  return WEIGHTED_SHAPES[Math.floor(Math.random() * WEIGHTED_SHAPES.length)];
 }
 
 function randomColor() {
