@@ -395,19 +395,55 @@ function updatePreview(x, y) {
   // Snap ghost to grid
   moveGhost(x, y, { anchorR, anchorC });
 
-  dragging.shape.cells.forEach(([dr, dc]) => {
-    const r = anchorR + dr;
-    const c = anchorC + dc;
-    if (r >= 0 && r < GRID && c >= 0 && c < GRID) {
-      const cellEl = boardEl.children[r * GRID + c];
-      cellEl.classList.add(valid ? 'preview' : 'preview-invalid');
+  if (valid) {
+    // Show preview cells
+    dragging.shape.cells.forEach(([dr, dc]) => {
+      const r = anchorR + dr;
+      const c = anchorC + dc;
+      if (r >= 0 && r < GRID && c >= 0 && c < GRID) {
+        boardEl.children[r * GRID + c].classList.add('preview');
+      }
+    });
+
+    // Check if placement would complete any lines — highlight them
+    const tempGrid = grid.map(row => [...row]);
+    dragging.shape.cells.forEach(([dr, dc]) => {
+      tempGrid[anchorR + dr][anchorC + dc] = dragging.color;
+    });
+    for (let r = 0; r < GRID; r++) {
+      if (tempGrid[r].every(v => v !== 0)) {
+        for (let c = 0; c < GRID; c++) {
+          boardEl.children[r * GRID + c].classList.add('preview-line');
+        }
+      }
     }
-  });
+    for (let c = 0; c < GRID; c++) {
+      if (tempGrid.every(row => row[c] !== 0)) {
+        for (let r = 0; r < GRID; r++) {
+          boardEl.children[r * GRID + c].classList.add('preview-line');
+        }
+      }
+    }
+  } else {
+    // Invalid — mark overlap cells with warning, show others as preview
+    dragging.shape.cells.forEach(([dr, dc]) => {
+      const r = anchorR + dr;
+      const c = anchorC + dc;
+      if (r >= 0 && r < GRID && c >= 0 && c < GRID) {
+        const cellEl = boardEl.children[r * GRID + c];
+        if (grid[r][c] !== 0) {
+          cellEl.classList.add('preview-clash');
+        } else {
+          cellEl.classList.add('preview-invalid');
+        }
+      }
+    });
+  }
 }
 
 function clearPreview() {
-  boardEl.querySelectorAll('.preview, .preview-invalid').forEach(el => {
-    el.classList.remove('preview', 'preview-invalid');
+  boardEl.querySelectorAll('.preview, .preview-invalid, .preview-clash, .preview-line').forEach(el => {
+    el.classList.remove('preview', 'preview-invalid', 'preview-clash', 'preview-line');
   });
   currentPreview = null;
 }
