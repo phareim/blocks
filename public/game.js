@@ -75,7 +75,27 @@ function init() {
   highScoreEl.textContent = highScore;
   overlay.classList.remove('visible');
   buildBoard();
+  seedBoard();
+  renderBoard();
   spawnPieces();
+}
+
+// Place some random blocks on the board at start to make it interesting
+function seedBoard() {
+  const numPieces = 3 + Math.floor(Math.random() * 3); // 3-5 pieces
+  for (let i = 0; i < numPieces; i++) {
+    const shape = randomShape();
+    const color = randomColor();
+    // Try random positions until one fits
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const r = Math.floor(Math.random() * GRID);
+      const c = Math.floor(Math.random() * GRID);
+      if (canPlace(shape, r, c)) {
+        place(shape, color, r, c);
+        break;
+      }
+    }
+  }
 }
 
 function buildBoard() {

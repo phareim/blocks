@@ -149,13 +149,13 @@ h1 span {
 }
 
 /* Color assignments */
-.cell.color-1 { background: var(--c1); --block-glow: rgba(255,60,111,0.35); }
-.cell.color-2 { background: var(--c2); --block-glow: rgba(0,229,160,0.35); }
-.cell.color-3 { background: var(--c3); --block-glow: rgba(61,139,255,0.35); }
-.cell.color-4 { background: var(--c4); --block-glow: rgba(255,184,48,0.35); }
-.cell.color-5 { background: var(--c5); --block-glow: rgba(168,85,247,0.35); }
-.cell.color-6 { background: var(--c6); --block-glow: rgba(0,212,255,0.35); }
-.cell.color-7 { background: var(--c7); --block-glow: rgba(255,107,53,0.35); }
+.color-1 { background: var(--c1); --block-glow: rgba(255,60,111,0.35); }
+.color-2 { background: var(--c2); --block-glow: rgba(0,229,160,0.35); }
+.color-3 { background: var(--c3); --block-glow: rgba(61,139,255,0.35); }
+.color-4 { background: var(--c4); --block-glow: rgba(255,184,48,0.35); }
+.color-5 { background: var(--c5); --block-glow: rgba(168,85,247,0.35); }
+.color-6 { background: var(--c6); --block-glow: rgba(0,212,255,0.35); }
+.color-7 { background: var(--c7); --block-glow: rgba(255,107,53,0.35); }
 
 /* Clear animation */
 .cell.clearing {
