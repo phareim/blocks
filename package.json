@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "prettier": "^3.8.1"
+  },
+  "overrides": {
+    "qs": "6.16.0"
   }
 }
